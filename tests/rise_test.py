@@ -33,6 +33,7 @@ driver.get(url)
 driver.implicitly_wait(10)
 
 main_window_handle = driver.current_window_handle
+
 new_nb_button = driver.find_element(By.XPATH, '//div[@data-category="Notebook"]')
 print("Found new notebook button")
 new_nb_button.click()
@@ -54,3 +55,4 @@ print("returning to homepage")
 
 driver.switch_to.window(main_window_handle)
 driver.refresh()
+print("Rise Extension is working!")
