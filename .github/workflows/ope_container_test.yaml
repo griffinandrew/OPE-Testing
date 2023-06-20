@@ -1,35 +1,48 @@
-name: Image Test
+name: OPE Container Test
 
 on:
   push:
     branches: 
-      - 'container*'
+      - '*'
 
 env:
     REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
 
 jobs:
-    build:
+  Build:
     runs-on: ubuntu-latest #use the latest ubuntu container image 
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
+     
+      - name: Setting up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
       - name: Build the image
         run: |
+          python --version
           make build
         
       - name: Push beta version
         run: |
           REGISTRY=$(cat base/ope_book_registry)
           REGISTRY_USER=$(cat base/ope_book_user)
+          echo $REGISTRY $REGISTRY_USER
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
           make push
+
+      - name: Show Debug info
+        run: |
+          IMAGE_TAG=$( make show-tag )
+          echo "For debugging purposes, here is the image tag:"
+          echo "  $IMAGE_TAG"
       
   
-  test:
+  UI-Test:
     runs-on: ubuntu-latest #use the latest ubuntu container image
-    # needs: build
+    needs: build
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
@@ -39,16 +52,20 @@ jobs:
         with:
           python-version: '3.9'
         
-       # Need to fetch reqs if needed
-
       - name: Install Chromium
         run: |
           sudo apt-get update
           sudo apt-get install -y chromium-browser
+          sudo apt-get upgrade chromium-browser
 
       - name: Installing necessary python packages
-        run: pip install selenium webdriver_manager jupyterlab
-          
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+          pip install --upgrade selenium
+          pip install --upgrade webdriver_manager
+          chromedriver --version
+
       - name: Pull beta-version
         run: |
           make pull-beta
@@ -58,37 +75,33 @@ jobs:
           make run-beta &
           sleep 3
 
-      # - name: Show debug info
-      #   run: |
-      #     IMAGE_TAG=$( make show-tag )
-      #     echo "For debugging purposes, here is the image tag:"
-      #     echo "  $IMAGE_TAG"
-
-      # - name: Comparing checksum value
-      #   run: |
-      #     PERMISSIONS_CHECKSUM=$( make checksum )
-      #     echo $PERMISSIONS_CHECKSUM
-      #     QUICK_TRIM=${PERMISSIONS_CHECKSUM::64}
-      #     #CHECKSUM=$( cat base/checksum.txt )
-      #     if [[ "$QUICK_TRIM == $CHECKSUM" ]]; then
-      #           echo "SUCCESS" 
-      #     else 
-      #           echo "FAILURE"
-      #           echo "Here is the image checksum:"
-      #           echo "  $QUICK_TRIM"
-      #           echo "Here is the correct checksum:"
-      #           echo "  $CHECKSUM"
-      #     fi
-
       - name: Run RISE extension tests
         run: |
-          container_id=$(docker ps -q | head -n 1)
-          echo $container_id
-          token=$(docker exec $container_id jupyter lab list 2>&1 | grep -o "token=[^ ]*" | cut -d= -f2)
-          python3 tests/rise_click.py $token
+          sleep 3
+          make -C tests rise-test
+      
+      - name: Run Screenshots difference tests
+        run: |
+          sleep 5
+          make -C tests screenshots-test
   
-  # approval:
-  #   needs: test
+  Image-Test:
+    runs-on: ubuntu-latest #use the latest ubuntu container image
+    needs: build
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Pull beta-version
+        run: |
+          make pull-beta
+
+      - name: Comparing checksum value
+        run: |
+          make -C tests checksum-test
+
+  # Approval:
+  #   needs: [UI-Test, Image-Test]
   #   environment:
   #     name: approval
   #   runs-on: ubuntu-latest
@@ -96,8 +109,8 @@ jobs:
   #   - name: manual approve
   #     run: |
   #         echo "Publication approved"
-
-  # publish:
+  
+  # Publish:
   #   runs-on: ubuntu-latest #use the latest ubuntu container image
   #   needs: approval
   #   steps:
@@ -106,5 +119,7 @@ jobs:
 
   #     - name: Push to public version
   #       run: |
+  #         REGISTRY=$(cat base/ope_book_registry)
+  #         REGISTRY_USER=$(cat base/ope_book_user)
   #         docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
   #         make publish
