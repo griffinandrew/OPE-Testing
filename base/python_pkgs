@@ -13,4 +13,3 @@ jupyterlab-myst
 jupyterlab-spellchecker
 nbconvert
 pyppeteer
-gdb
