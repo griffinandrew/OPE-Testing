@@ -31,9 +31,7 @@ base_screenshots: screenshots
 base_screenshots:
 	mv *.png base_screenshots
 
-
 clean:
 	rm -rf *.png
 	rm -rf *.ipynb
 	rm -rf .ipynb_checkpoints
-

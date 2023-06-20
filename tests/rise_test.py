@@ -16,13 +16,13 @@ url = "http://127.0.0.1:8888/lab?token=" + token
 chrome_options = Options()
 
 if platform.system() == 'Windows' or platform.system() == 'Darwin':
-    chrome_options.add_experimental_option('detach', True)
     #chrome_options.add_argument('--headless')
     driver = webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install()), options=chrome_options)
 elif platform.system() == 'Linux':
     chrome_options.add_argument('--headless') # Inorder for Action to run, it needs to be headless
     driver = webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install(), chrome_type=ChromeType.GOOGLE), options=chrome_options)
-    #driver = webdriver.Chrome(service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()), options=chrome_options) #kes og command
+
+    #driver = webdriver.Chrome(service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()), options=chrome_options)
 else:
     print("Unknown OS")
     exit(1)
