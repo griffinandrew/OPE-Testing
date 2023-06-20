@@ -6,6 +6,9 @@
 SHELL := /bin/bash
 CUST := $(shell if  [[ -a base/customization_name ]]; then cat base/customization_name;  fi)
 
+# I think bash is failing to intialze at line 1
+CUST := ope
+
 # User must specify customization suffix
 ifndef CUST
 $(error CUST is not set.  You must specify which customized version of the image you want to work with. Eg. make CUST=opf build)
