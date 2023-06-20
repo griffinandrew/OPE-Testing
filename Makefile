@@ -11,6 +11,7 @@ ifndef CUST
 $(error CUST is not set.  You must specify which customized version of the image you want to work with. Eg. make CUST=opf build)
 endif
 
+
 OPE_BOOK := $(shell cat base/ope_book)
 # USER id
 OPE_UID := $(shell cat base/ope_uid)
@@ -81,7 +82,7 @@ push: ## push private build
 pull-beta: DARGS ?=
 pull-beta: ## pull most recent private version
 	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
-
+  
 publish: pull-beta
 publish: DARGS ?=
 publish: ## publish current private build to public published version

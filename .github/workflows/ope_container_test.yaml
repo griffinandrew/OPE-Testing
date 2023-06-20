@@ -32,6 +32,7 @@ jobs:
         run: |
           REGISTRY=$(cat base/ope_book_registry)
           REGISTRY_USER=$(cat base/ope_book_user)
+          docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
           make push
 
       - name: Show Debug info
@@ -123,4 +124,3 @@ jobs:
   #         REGISTRY_USER=$(cat base/ope_book_user)
   #         docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
   #         make publish
-
