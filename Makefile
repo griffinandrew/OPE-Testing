@@ -11,7 +11,6 @@ ifndef CUST
 $(error CUST is not set.  You must specify which customized version of the image you want to work with. Eg. make CUST=opf build)
 endif
 
-
 OPE_BOOK := $(shell cat base/ope_book)
 # USER id
 OPE_UID := $(shell cat base/ope_uid)
@@ -126,7 +125,6 @@ user: DARGS ?=
 user: ## start private version with usershell to poke around
 	-docker run -it --rm $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(ARGS)
 
-
 ### PUBLIC USAGE TARGETS
 pull: 
 pull: ## pull most recent public version
@@ -138,4 +136,3 @@ run: DARGS ?= -u $(OPE_UID):$(OPE_GID) -v "${HOST_DIR}":"${MOUNT_DIR}" -v "${SSH
 run: PORT ?= 8888
 run: ## start published version with jupyter lab interface
 	docker run -it --rm -p $(PORT):$(PORT) $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG) $(ARGS) 
-
