@@ -5,8 +5,9 @@ jupytext
 widgetsnbextension 
 matplotlib
 pandas 
-jupyter_contrib_nbextensions 
-ipydrawio 
+jupyter_nbextensions_configurator
+jupyter_contrib_nbextensions
+ipydrawio
 ipydrawio-export 
 jupyterlab-myst 
 jupyterlab-spellchecker
