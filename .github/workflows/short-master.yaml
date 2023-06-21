@@ -78,8 +78,7 @@ jobs:
         run: |
           docker images -a
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
-          echo "image = $IMAGE "
-          docker run -d --name stable $IM
+          docker run -d --name stable $IMAGE
           sleep 7 #wait to start to check health
           docker ps -a
           CONTAINER_NAME="stable"
