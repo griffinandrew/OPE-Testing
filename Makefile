@@ -6,6 +6,9 @@
 SHELL := /bin/bash
 CUST := $(shell if  [[ -a base/customization_name ]]; then cat base/customization_name;  fi)
 
+# I think bash is failing to intialze at line 1
+CUST := ope
+
 # User must specify customization suffix
 ifndef CUST
 $(error CUST is not set.  You must specify which customized version of the image you want to work with. Eg. make CUST=opf build)
@@ -96,7 +99,7 @@ publish: ## publish current private build to public published version
 	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)
 
 
-checksum: ARGS ?= find / -not \( -path /proc -prune \) -not \( -path /sys -prune \) -type f -exec stat -c '%n %a' {} + | LC_ALL=C sort | sha256sum
+checksum: ARGS ?= find / -not \( -path /proc -prune \) -not \( -path /sys -prune \) -type f -exec stat -c '%n %a' {} + | LC_ALL=C sort | sha256sum | cut -c 1-64
 checksum: DARGS ?= -u 0
 checksum: ## start private version  with root shell to do admin and poke around
 	@-docker run -i --rm $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(ARGS)
@@ -106,7 +109,6 @@ run-beta: DARGS ?= -u $(OPE_UID):$(OPE_GID) -v "${HOST_DIR}":"${MOUNT_DIR}" -v "
 run-beta: PORT ?= 8888
 run-beta: ## start published version with jupyter lab interface
 	docker run -i --rm -p $(PORT):$(PORT) $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(ARGS)
-
 
 show-tag: ARGS ?=
 show-tag: DARGS ?=
@@ -138,3 +140,4 @@ run: DARGS ?= -u $(OPE_UID):$(OPE_GID) -v "${HOST_DIR}":"${MOUNT_DIR}" -v "${SSH
 run: PORT ?= 8888
 run: ## start published version with jupyter lab interface
 	docker run -it --rm -p $(PORT):$(PORT) $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG) $(ARGS) 
+
