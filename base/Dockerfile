@@ -44,8 +44,8 @@ USER ${NB_UID}
 #RUN python --version
 
 RUN conda install --quiet --yes conda=23.3.1 python=3.9.16 --no-pin && \ 
-    conda install --quiet --yes ${PYTHON_PREREQ_VERSIONS} && \
-    conda install --quiet --yes ${PYTHON_INSTALL_PACKAGES} && \
+    mamba install --quiet --yes ${PYTHON_PREREQ_VERSIONS} && \
+    mamba install --quiet --yes ${PYTHON_INSTALL_PACKAGES} && \
     #mamba install --quiet --yes jupyter_contrib_nbextensions=0.7.0 && \
     pip install nbclient==0.5.13 && \
     pip install jupyterlab_rise && \
