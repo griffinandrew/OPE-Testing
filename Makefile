@@ -86,6 +86,7 @@ pull-beta: DARGS ?=
 pull-beta: ## pull most recent private version
 	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
 
+
 publish: pull-beta
 publish: DARGS ?=
 publish: ## publish current private build to public published version
@@ -114,7 +115,7 @@ show-tag: ARGS ?=
 show-tag: DARGS ?=
 show-tag: ## tag current private build as beta
 	@-echo $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
-
+  
 
 ### DEBUG TARGETS
 

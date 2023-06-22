@@ -40,6 +40,7 @@ new_nb_button = driver.find_element(By.XPATH, '//div[@data-category="Notebook"]'
 print("Found new notebook button")
 new_nb_button.click()
 
+
 rise_button = driver.find_element(By.XPATH, '//button[@data-command="RISE:preview"]')
 print("Found RISE presentation button")
 rise_button.click()
