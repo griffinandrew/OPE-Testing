@@ -38,7 +38,7 @@ time.sleep(10)
 driver.save_screenshot('main_screenshot.png')
 print("Saved main screenshot")
 
-wait = WebDriverWait(driver, 10)  # Wait for a maximum of 10 seconds
+wait = WebDriverWait(driver, 25)  # Wait for a maximum of 10 seconds
 
 new_nb_button = wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@data-category="Notebook"]')))
 #new_nb_button = driver.find_element(By.XPATH, '//div[@data-category="Notebook"]')

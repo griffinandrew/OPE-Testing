@@ -282,8 +282,8 @@ jobs:
           sleep 5
           make -C tests rise-test
       
-      #- name: Run Screenshots difference tests
-      #  run: |
-      #    sleep 5
-      #    make -C tests screenshots-test
+      - name: Run Screenshots difference tests
+        run: |
+          sleep 5
+          make -C tests screenshots-test
 
