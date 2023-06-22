@@ -12,3 +12,4 @@ echo $(while read pkg; do
        echo "${pkg}"
    fi
 done)
+
