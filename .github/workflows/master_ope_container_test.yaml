@@ -1,4 +1,4 @@
-name: compressed master test
+name: OPE Container Master Test
 on:
   push:
     branches:
