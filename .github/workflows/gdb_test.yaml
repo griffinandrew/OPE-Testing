@@ -1,7 +1,8 @@
 name: gdb test
 on:
   push:
-    branches: container-base-ope
+    branches: 
+      - '*'
 jobs:
   checksum:
     runs-on: ubuntu-latest #use the latest ubuntu container image 
