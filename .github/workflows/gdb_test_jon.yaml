@@ -22,7 +22,7 @@ jobs:
         run: |
          IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
          docker run -d --name stable $IMAGE
-         ehco "start part 1"
+         echo "start part 1"
          docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq
          echo "finsihed part 1"
          echo "begin part 2"
