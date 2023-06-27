@@ -1,0 +1,32 @@
+name: gdb test
+on:
+  push:
+    branches: 
+      - '*'
+jobs:
+  checksum:
+    runs-on: ubuntu-latest #use the latest ubuntu container image 
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4 #use action to install python
+        with:
+          python-version: "3.9"
+      - name: Install dependencies #requirements docs unable to read, hard installing dependencies 
+        run: |
+          pip install -r requirements/requirements.txt    
+      - name: build # makes the container image build and then creates var with checksum value to be compared 
+        run: |
+          make build
+      - name: run gdb #creates var with checksum value to be compared 
+        run: |
+         IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
+         docker run -d --name stable $IMAGE
+         ehco "start part 1"
+         docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq
+         echo "finsihed part 1"
+         echo "begin part 2"
+         docker exec stable setarch $(uname -m) -R /bin/bash
+         echo "finshed part 2"
+
+
