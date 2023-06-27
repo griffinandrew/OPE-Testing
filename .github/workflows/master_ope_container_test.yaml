@@ -287,3 +287,28 @@ jobs:
           sleep 5
           make -C tests screenshots-test
 
+  # Approval:
+  #   needs: [setup-and-build, health-check, image-version-check, jupnb-test, package-vers-test, checksum, size-time, UI-Test ]
+  #   environment:
+  #     name: approval
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: manual approve
+  #     run: |
+  #         echo "Publication approved"
+
+  # Publish:
+  #   runs-on: ubuntu-latest #use the latest ubuntu container image
+  #   needs: approval
+  #   steps:
+  #     - name: Checkout the code
+  #       uses: actions/checkout@v3
+
+  #     - name: Push to public version
+  #       run: |
+  #         REGISTRY=$(cat base/ope_book_registry)
+  #         REGISTRY_USER=$(cat base/ope_book_user)
+  #         docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
+  #         make publish
+
+
