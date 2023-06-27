@@ -27,7 +27,7 @@ jobs:
          echo "about to copy"
          docker cp tests/gdb_test_file.py $container_id:/home/jovyan/work/gdb_test_file.py
          echo "copy to container"
-         docker exec stable gdb -ex "python import sys; sys.path.append('.')" -ex "python import tests.gdb_test_file" -ex "break tests.gdb_test_file.divide" -ex "run" -ex "next" -ex "next" -ex "continue" -ex "set logging on /home/jovyan/my_gdb_output.txt" -ex "continue" -ex "quit"
+         docker exec stable gdb -ex "python import sys; sys.path.append('.')" -ex "python import work.gdb_test_file" -ex "break work.gdb_test_file.divide" -ex "run" -ex "next" -ex "next" -ex "continue" -ex "set logging on /home/jovyan/my_gdb_output.txt" -ex "continue" -ex "quit"
          echo "run gdb"
          #docker exec stable realpath /home/jovyan/my_gdb_output.txt
          docker cp stable:/home/jovyan/my_gdb_output.txt .
