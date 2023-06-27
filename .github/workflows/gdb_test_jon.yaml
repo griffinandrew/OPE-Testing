@@ -25,8 +25,7 @@ jobs:
          echo "start part 1"
          docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq
          echo "finsihed part 1"
-         echo "begin part 2"
-         docker exec stable setarch $(uname -m) -R /bin/bash
-         echo "finshed part 2"
+         #docker exec stable setarch $(uname -m) -R /bin/bash
+         #echo "finshed part 2"
 
 
