@@ -1,4 +1,4 @@
-name: gdb test
+name: gdb test jon 
 on:
   push:
     branches: 
