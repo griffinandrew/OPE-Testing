@@ -332,6 +332,11 @@ jobs:
             });
             console.log(`Approval required: ${approvalUrl}`);
 
+     - name: Continue After Approval
+       if: steps.approval.outputs.approvalUrl != ''
+       run: echo "The approval has been granted. Proceed with the next steps."
+
+
 
 
   Publish:
