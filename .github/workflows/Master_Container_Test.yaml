@@ -161,7 +161,7 @@ jobs:
           echo "container healthy"
           else
           echo ""
-          echo "************FAILURE***********""
+          echo "************FAILURE***********"
           echo ""
           cat ./output.txt
           exit -1
