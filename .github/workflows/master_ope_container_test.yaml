@@ -94,6 +94,7 @@ jobs:
           echo ""
           docker stop stable
 
+
   image-version-check:
     needs: setup-and-build
     runs-on: ubuntu-latest
@@ -120,6 +121,7 @@ jobs:
                 echo "INCORRECT IMAGE or VERSION, $REPO_TAG is not the proper image $IMAGE"
                 exit -1
           fi
+
 
   jupnb-test:
     needs: setup-and-build
@@ -172,7 +174,6 @@ jobs:
         run: docker stop stable
 
 
-
   package-vers-test:
     needs: setup-and-build
     runs-on: ubuntu-latest
@@ -200,6 +201,7 @@ jobs:
           python3 version-check.py ./list.txt versions.txt #send to python for checking
           docker stop stable
   
+
   checksum:
     needs: setup-and-build
     runs-on: ubuntu-latest
@@ -210,6 +212,7 @@ jobs:
       - name: run checksum
         run: |
           make -C tests checksum-test
+
 
   size-time:
     needs: setup-and-build
@@ -286,6 +289,8 @@ jobs:
         run: |
           sleep 5
           make -C tests screenshots-test
+  
+  
   gdb-test:
     runs-on: ubuntu-latest #use the latest ubuntu container image 
     needs: setup-and-build
@@ -307,14 +312,12 @@ jobs:
          docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq
          expected_lines=100
          actual_lines=$(wc -l < out)
-         echo $actual_lines
          if [ "$actual_lines" -lt "$expected_lines" ]; then
          echo "******************Test failed****************" #if the output file contians no iterations through the test file, gdb has failed
          else
          echo "******************Test passed***************"
          fi
 
-      
 
   # Approval:
   #   needs: [setup-and-build, health-check, image-version-check, jupnb-test, package-vers-test, checksum, size-time, UI-Test ]
@@ -325,6 +328,7 @@ jobs:
   #   - name: manual approve
   #     run: |
   #         echo "Publication approved"
+
 
   # Publish:
   #   runs-on: ubuntu-latest #use the latest ubuntu container image
