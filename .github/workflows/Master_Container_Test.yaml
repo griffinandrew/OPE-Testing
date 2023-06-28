@@ -152,6 +152,7 @@ jobs:
           docker exec $container_id sh -c "echo 'c.NotebookApp.token = \"\"' >> /home/jovyan/.jupyter/jupyter_notebook_config.py" #create it without a token
           docker exec $container_id jupyter labextension install @jupyter-widgets/jupyterlab-manager #install widgets
           docker exec $container_id pip install nbclient
+          docker exec $container_id pip install nbconvert
           docker exec $container_id jupyter lab build --minimize=False
           docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb 2>&1 >> ./output.txt
           echo "done 1"
