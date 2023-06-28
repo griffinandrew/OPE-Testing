@@ -16,7 +16,7 @@ else
 	exit 1
 endif
 
-screenshots-test: screenshots
+#screenshots-test: screenshots
 screenshots-test:
 	python3 screenshots_diff.py
 
@@ -26,7 +26,7 @@ screenshots: TOKEN ?= $(shell docker exec $(CONT_ID) jupyter lab list 2>&1 | gre
 screenshots:
 	python3 mkscreenshots.py $(TOKEN)
 
-base_screenshots: screenshots
+base_screenshots: screenshots-test
 base_screenshots:
 	mv *.png base_screenshots
 

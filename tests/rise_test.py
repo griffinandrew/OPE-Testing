@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import platform
 import sys
+import time
 
 if len(sys.argv) <= 1:
     print("Invalid number of arguments")
@@ -30,7 +31,10 @@ else:
 print("Accessing url: "+url)
 driver.get(url)
 
-driver.implicitly_wait(10)
+driver.implicitly_wait(30)
+
+driver.save_screenshot('main_screenshot.png')
+print("Saved main screenshot")
 
 
 main_window_handle = driver.current_window_handle #used to return to base screen for next test
@@ -38,12 +42,22 @@ main_window_handle = driver.current_window_handle #used to return to base screen
 
 new_nb_button = driver.find_element(By.XPATH, '//div[@data-category="Notebook"]')
 print("Found new notebook button")
+
 new_nb_button.click()
+time.sleep(10)
+
+driver.save_screenshot('new_nb_screenshot.png')
+print("Saved new notebook screenshot")
 
 
 rise_button = driver.find_element(By.XPATH, '//button[@data-command="RISE:preview"]')
 print("Found RISE presentation button")
 rise_button.click()
+
+time.sleep(10)
+driver.save_screenshot('rise_screenshot.png')
+print("Saved rise screenshot")
+
 
 toolbar = driver.find_element(By.XPATH, "//div[@class='lm-Widget p-Widget jp-Toolbar' and @role='navigation']")
 fullscreen_button = toolbar.find_element(By.XPATH,".//button[@title='Open the slideshow in full screen']")
