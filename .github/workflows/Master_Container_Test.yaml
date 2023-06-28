@@ -141,7 +141,7 @@ jobs:
           container_id=$(docker ps -qf "name=stable" | head -n 1)
           docker cp tests/test.ipynb $container_id:/home/jovyan/work #mount test nb into container
       
-      - name: Wait for Container to Start
+      - name: Wait for Container Start
         run: |
           until docker exec stable jupyter lab --version; do sleep 1; done #start JupyterLab in notebook and wait until its up
       
