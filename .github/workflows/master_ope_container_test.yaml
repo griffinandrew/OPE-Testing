@@ -8,20 +8,22 @@ env:
     REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
 
 jobs:
-  setup-and-build:
+  Setup-and-Build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4 #use action to install python
         with:
           python-version: "3.9"
-      - name: Install dependencies #requirements docs unable to read, hard installing dependencies 
+      - name: Install Dependencies #requirements docs unable to read, hard installing dependencies 
         run: |
           pip install -r requirements/requirements.txt
             
-      - name: Checkout code
-        uses: actions/checkout@v2
+      #- name: Checkout Code
+      #  uses: actions/checkout@v3
 
       - name: Build
         run: |
@@ -40,7 +42,7 @@ jobs:
           echo "Image = $IMAGE"
           echo $IMAGE > ./image.txt   
 
-      - name: Push beta version
+      - name: Push Beta Version
         run: |
           REGISTRY=$(cat base/ope_book_registry)
           REGISTRY_USER=$(cat base/ope_book_user)
@@ -48,14 +50,14 @@ jobs:
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
           make push
       
-      - name: upload image
+      - name: Upload Image
         uses: actions/upload-artifact@v3
         with:
           name: image
           path: |
             image.txt
 
-      - name: upload time
+      - name: Upload Time
         uses: actions/upload-artifact@v3
         with:
           name: time
@@ -63,25 +65,23 @@ jobs:
             time.txt
       
 
-  health-check:
-    needs: setup-and-build
+  Health-Check:
+    needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
       
-      - name: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: pull image
+      - name: Pull Image
         run: |
           make pull-beta
 
-      - name: check-container-health
+      - name: Check Container Health
         run: |
-          docker images -a
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
           docker run -d --name stable $IMAGE
           sleep 7 #wait to start to check health
-          docker ps -a
           CONTAINER_NAME="stable"
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "$CONTAINER_NAME" | awk '{print $2}') #extract health status
           echo ""
@@ -95,19 +95,19 @@ jobs:
           docker stop stable
 
 
-  image-version-check:
-    needs: setup-and-build
+  Image-Version-Check:
+    needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
 
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: pull image
+      - name: Pull Image
         run: |
           make pull-beta
 
-      - name: check-container-health
+      - name: Check Image Version
         run: |
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get just built image
           echo "IMAGE = $IMAGE"
@@ -123,25 +123,25 @@ jobs:
           fi
 
 
-  jupnb-test:
-    needs: setup-and-build
+  JupyterNB-Test:
+    needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: pull image
+      - name: Pull Image
         run: |
           make pull-beta
       
-      - name: run container
+      - name: Run Container
         run: |
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
           docker run -d -p 8888:8888 --name stable -v /test.ipynb:/home/jovyan/work $IMAGE
           container_id=$(docker ps -qf "name=stable" | head -n 1)
           docker cp tests/test.ipynb $container_id:/home/jovyan/work #mount test nb into container
       
-      - name: Wait for container to start
+      - name: Wait for Container to Start
         run: |
           until docker exec stable jupyter lab --version; do sleep 1; done
       
@@ -170,23 +170,23 @@ jobs:
           fi
           echo ""
           echo "************SUCCESS***********"
-      - name: Stop Docker container
+      - name: Stop Docker Container
         run: docker stop stable
 
 
-  package-vers-test:
-    needs: setup-and-build
+  Package-Version-Test:
+    needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
       
-      - name: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: pull image
+      - name: Pull Image
         run: |
           make pull-beta
 
-      - name: checkout package versions
+      - name: Checkout Package Versions
         run: |
           cp tests/version-check.py ./version-check.py #add python script to compare vers to this file 
           cp tests/versions.txt ./versions.txt #add correct version list to compare against
@@ -202,35 +202,36 @@ jobs:
           docker stop stable
   
 
-  checksum:
-    needs: setup-and-build
+  Checksum:
+    needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: run checksum
+      - name: Run Checksum
         run: |
           make -C tests checksum-test
 
 
-  size-time:
-    needs: setup-and-build
+  Size-and-Time-Display:
+    needs: Setup-and-Build
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout the code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Download time
+      - name: Download Time
         uses: actions/download-artifact@v3
         with:
           name: time
 
-      - name: pull image
+      - name: Pull Image
         run: |
           make pull-beta
 
-      - name: extract size and display time and size
+      - name: Extract Size and Display Time and Size
         run: |
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
           echo "$IMAGE"
@@ -247,9 +248,10 @@ jobs:
 
   UI-Test:
     runs-on: ubuntu-latest #use the latest ubuntu container image
-    needs: setup-and-build
+    needs: Setup-and-Build
+    
     steps:
-      - name: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v3
       
       - name: Setting up Python
@@ -263,7 +265,7 @@ jobs:
           sudo apt-get install -y chromium-browser
           sudo apt-get upgrade chromium-browser
 
-      - name: Installing necessary python packages
+      - name: Install Necessary Python Packages
         run: |
           python -m pip install --upgrade pip
           pip install -r tests/requirements.txt
@@ -275,29 +277,31 @@ jobs:
         run: |
           make pull-beta
 
-      - name: Run JupyterLab inside container
+      - name: Run JupyterLab Inside Container
         run: |
           make run-beta &
           sleep 3
 
-      - name: Run RISE extension tests
+      - name: Run RISE Extension Test
         run: |
           sleep 5
           make -C tests rise-test
       
-      - name: Run Screenshots difference tests
+      - name: Run Screenshots Difference Test
         run: |
           sleep 5
           make -C tests screenshots-test
   
   
-  gdb-test:
+  gdb-Test:
     runs-on: ubuntu-latest #use the latest ubuntu container image 
-    needs: setup-and-build
+    needs: Setup-and-Build
+    
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Install dependencies #requirements docs unable to read, hard installing dependencies 
+      - name: Install Dependencies #requirements docs unable to read, hard installing dependencies 
         run: |
           pip install -r requirements/requirements.txt
 
@@ -305,7 +309,7 @@ jobs:
         run: |
           make pull-beta
 
-      - name: run gdb #creates var with checksum value to be compared 
+      - name: Run gdb
         run: |
          IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
          docker run -d --name stable $IMAGE
@@ -319,15 +323,16 @@ jobs:
          fi
 
 
-  # Approval:
-  #   needs: [setup-and-build, health-check, image-version-check, jupnb-test, package-vers-test, checksum, size-time, UI-Test ]
-  #   environment:
-  #     name: approval
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: manual approve
-  #     run: |
-  #         echo "Publication approved"
+  Approval:
+     needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
+     environment:
+       name: approval
+     runs-on: ubuntu-latest
+     
+     steps:
+     - name: Manual Approve
+       run: |
+        echo "Publication approved"
 
 
   # Publish:
