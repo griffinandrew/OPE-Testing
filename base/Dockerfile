@@ -44,7 +44,7 @@ USER ${NB_UID}
 #RUN python --version
 
 #RUN conda install --quiet --yes conda=23.3.1 python=3.9.16 --no-pin --force-reinstall && \ 
-RUN pip install mamba==0.8.0
+RUN pip install mamba==0.8.0 && \
     mamba install --quiet --yes ${PYTHON_PREREQ_VERSIONS} && \
     mamba install --quiet --yes ${PYTHON_INSTALL_PACKAGES} && \
     pip install nbclient==0.5.13 && \
