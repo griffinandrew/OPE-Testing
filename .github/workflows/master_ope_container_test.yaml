@@ -286,6 +286,35 @@ jobs:
         run: |
           sleep 5
           make -C tests screenshots-test
+  gdb-test:
+    runs-on: ubuntu-latest #use the latest ubuntu container image 
+    needs: setup-and-build
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies #requirements docs unable to read, hard installing dependencies 
+        run: |
+          pip install -r requirements/requirements.txt
+
+      - name: Pull beta-version
+        run: |
+          make pull-beta
+
+      - name: run gdb #creates var with checksum value to be compared 
+        run: |
+         IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
+         docker run -d --name stable $IMAGE
+         docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq
+         expected_lines=100
+         actual_lines=$(wc -l < out)
+         echo $actual_lines
+         if [ "$actual_lines" -lt "$expected_lines" ]; then
+         echo "******************Test failed****************" #if the output file contians no iterations through the test file, gdb has failed
+         else
+         echo "******************Test passed***************"
+         fi
+
+      
 
   # Approval:
   #   needs: [setup-and-build, health-check, image-version-check, jupnb-test, package-vers-test, checksum, size-time, UI-Test ]
