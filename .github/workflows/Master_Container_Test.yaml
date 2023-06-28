@@ -161,7 +161,8 @@ jobs:
           #docker exec $container_id jupyter nbconvert --execute /home/jovyan/work/test.ipynb --to pdf --stdout >> ./output2.txt
           docker exec $container_id jupyter nbconvert --execute /home/jovyan/work/test.ipynb --to markdown --stdout >> ./output.md
           echo "done 2"
-          cat ./output.md
+          mv ./output.md ./output2.txt
+          cat ./output2.txt
           sleep 10
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}') #extract health status
           echo ""
