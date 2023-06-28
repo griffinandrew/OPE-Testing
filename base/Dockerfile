@@ -44,7 +44,9 @@ USER ${NB_UID}
 #RUN python --version
 
 #RUN conda install --quiet --yes conda=23.3.1 python=3.9.16 --no-pin --force-reinstall && \ 
-RUN pip install watchdog==0.6.0 && \
+RUN install --upgrade pip && \
+    pip cache purge && \
+    pip install watchdog==0.6.0 && \
     pip install mamba==0.8.0 && \
     mamba install --quiet --yes ${PYTHON_PREREQ_VERSIONS} && \
     mamba install --quiet --yes ${PYTHON_INSTALL_PACKAGES} && \
