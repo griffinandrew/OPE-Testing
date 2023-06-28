@@ -153,7 +153,7 @@ jobs:
           docker exec $container_id jupyter labextension install @jupyter-widgets/jupyterlab-manager #install widgets
           docker exec $container_id pip install nbclient
           docker exec $container_id jupyter lab build --minimize=False
-          docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb >> ./output.txt #record the output of test nb in case of failure
+          docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb >> ./output.txt
           sleep 10
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}') #extract health status
           echo ""
