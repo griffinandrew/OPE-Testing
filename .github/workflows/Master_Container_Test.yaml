@@ -11,15 +11,15 @@ jobs:
   Setup-and-Build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Code #loads repo into action
         uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v4 #use action to install python
+        uses: actions/setup-python@v4 
         with:
           python-version: "3.9"
       
-      - name: Install Dependencies #requirements docs unable to read, hard installing dependencies 
+      - name: Install Dependencies
         run: |
           pip install -r requirements/requirements.txt
             
@@ -34,7 +34,7 @@ jobs:
           min=${elapsed%.*}  #extract min part 
           sec_cut=${elapsed#*.} #get the decimal 
           sec_round="${sec_cut:0:1}.${sec_cut:1}"
-          sec=$( echo "$sec_round * 6" | bc -l) #calc sec's
+          sec=$( echo "$sec_round * 6" | bc -l) #calc secs
           echo "BUILD TIME:  $min MIN $sec SECS  or  $seconds seconds" > ./time.txt #send to file for use in diff run
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
           echo "Image = $IMAGE"
@@ -114,11 +114,12 @@ jobs:
           docker inspect $IMAGE > image.json #write inspect info to json for parsing
           REPO_TAG=$(jq -r '.[0].RepoTags[0]' image.json) #acquire tag
           if [[ "$REPO_TAG" == "$IMAGE" ]]; then
-                echo "CORRECT IMAGE AND VERSION: $IMAGE"
+          echo "CORRECT IMAGE AND VERSION: $IMAGE"
           else
-                echo "INCORRECT IMAGE or VERSION, $REPO_TAG is not the proper image $IMAGE"
-                exit -1
+          echo "INCORRECT IMAGE or VERSION, $REPO_TAG is not the proper image $IMAGE"
+          exit -1
           fi
+          docker stop stable
 
 
   JupyterNB-Test:
@@ -142,7 +143,7 @@ jobs:
       
       - name: Wait for Container to Start
         run: |
-          until docker exec stable jupyter lab --version; do sleep 1; done
+          until docker exec stable jupyter lab --version; do sleep 1; done #start JupyterLab in notebook and wait until its up
       
       - name: Execute Notebook
         run: |
@@ -152,13 +153,15 @@ jobs:
           docker exec $container_id jupyter labextension install @jupyter-widgets/jupyterlab-manager #install widgets
           docker exec $container_id pip install nbclient
           docker exec $container_id jupyter lab build --minimize=False
-          docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb >> ./output.txt
-          sleep 5
+          docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb >> ./output.txt #record the output of test nb in case of failure
+          sleep 10
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}') #extract health status
           echo ""
           if [[ "$HEALTH" == "Up" ]]; then
           echo "container healthy"
           else
+          echo ""
+          echo "************FAILURE***********""
           echo ""
           cat ./output.txt
           exit -1
@@ -308,7 +311,7 @@ jobs:
         run: |
          IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
          docker run -d --name stable $IMAGE
-         docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq
+         docker exec stable bash -c 'for ((i=0;i<100; i++)); do gdb -ex starti -ex quit -q --batch /usr/bin/date 2>/dev/null | grep ld; done' | tee out | uniq #run jonatahns gdb test
          expected_lines=100
          actual_lines=$(wc -l < out)
          if [ "$actual_lines" -lt "$expected_lines" ]; then
