@@ -154,6 +154,10 @@ jobs:
           docker exec $container_id pip install nbclient
           docker exec $container_id jupyter lab build --minimize=False
           docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb 2>&1 >> ./output.txt
+          echo "done 1"
+          docker exec $container_id jupyter nbconvert --execute /home/jovyan/work/test.ipynb --output ./output.html --to html && cat ./output.html > ./output2.txt
+          echo "done 2"
+          cat ./output2.txt
           sleep 10
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}') #extract health status
           echo ""
