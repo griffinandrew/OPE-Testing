@@ -11,7 +11,7 @@ jobs:
   Setup-and-Build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Pull Image
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout the code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Pull Image
@@ -127,7 +127,7 @@ jobs:
     needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Pull Image
@@ -170,8 +170,7 @@ jobs:
           fi
           echo ""
           echo "************SUCCESS***********"
-      - name: Stop Docker Container
-        run: docker stop stable
+          docker stop stable
 
 
   Package-Version-Test:
@@ -251,7 +250,7 @@ jobs:
     needs: Setup-and-Build
     
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
       
       - name: Setting up Python
@@ -321,6 +320,7 @@ jobs:
          else
          echo "******************Test passed***************"
          fi
+         docker stop stable
 
 
   Approval:
