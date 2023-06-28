@@ -156,10 +156,10 @@ jobs:
           docker exec $container_id jupyter lab build --minimize=False
           docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb 2>&1 >> ./output.txt
           echo "done 1"
-          docker exec $container_id jupyter nbconvert --execute /home/jovyan/work/test.ipynb --to markdown --stdout >> ./output.md
+          #docker exec $container_id jupyter nbconvert --execute /home/jovyan/work/test.ipynb --to markdown --stdout >> ./output.md
           echo "done 2"
-          mv ./output.md ./output2.txt
-          cat ./output2.txt
+          #mv ./output.md ./output2.txt
+          #cat ./output2.txt
           sleep 10
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}') #extract health status
           echo ""
