@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-python@v4 #use action to install python
         with:
           python-version: "3.9"
+      
       - name: Install Dependencies #requirements docs unable to read, hard installing dependencies 
         run: |
           pip install -r requirements/requirements.txt
@@ -109,11 +110,11 @@ jobs:
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get just built image
           echo "IMAGE = $IMAGE"
           docker run -d --name stable $IMAGE
-          ID=$( docker ps -aqf "name=stable" )     #get id of image
-          docker inspect $IMAGE > image.json #right inspect info to json for parsing
+          ID=$( docker ps -aqf "name=stable" ) #get id of image
+          docker inspect $IMAGE > image.json #write inspect info to json for parsing
           REPO_TAG=$(jq -r '.[0].RepoTags[0]' image.json) #acquire tag
           if [[ "$REPO_TAG" == "$IMAGE" ]]; then
-                echo "CORRECT IMAGE AND VERSION"
+                echo "CORRECT IMAGE AND VERSION: $IMAGE"
           else
                 echo "INCORRECT IMAGE or VERSION, $REPO_TAG is not the proper image $IMAGE"
                 exit -1
@@ -124,6 +125,7 @@ jobs:
     needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
+      
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -145,18 +147,14 @@ jobs:
       - name: Execute Notebook
         run: |
           container_id=$(docker ps -qf "name=stable" | head -n 1)
-          echo $container_id
           docker exec $container_id jupyter lab --generate-config
           docker exec $container_id sh -c "echo 'c.NotebookApp.token = \"\"' >> /home/jovyan/.jupyter/jupyter_notebook_config.py" #create it without a token
           docker exec $container_id jupyter labextension install @jupyter-widgets/jupyterlab-manager #install widgets
           docker exec $container_id pip install nbclient
           docker exec $container_id jupyter lab build --minimize=False
-          echo "running notebook"
-          docker exec $container_id ls /home/jovyan/work
           docker exec $container_id jupyter execute /home/jovyan/work/test.ipynb >> ./output.txt
           sleep 5
-          HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}')
-          docker ps -a
+          HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "stable" | awk '{print $2}') #extract health status
           echo ""
           if [[ "$HEALTH" == "Up" ]]; then
           echo "container healthy"
@@ -202,6 +200,7 @@ jobs:
     needs: Setup-and-Build
     runs-on: ubuntu-latest
     steps:
+      
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -213,8 +212,8 @@ jobs:
   Size-and-Time-Display:
     needs: Setup-and-Build
     runs-on: ubuntu-latest
-    
     steps:
+      
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -245,8 +244,8 @@ jobs:
   UI-Test:
     runs-on: ubuntu-latest #use the latest ubuntu container image
     needs: Setup-and-Build
-    
     steps:
+      
       - name: Checkout Code
         uses: actions/checkout@v3
       
@@ -281,23 +280,23 @@ jobs:
       - name: Run RISE Extension Test
         run: |
           sleep 5
-          make -C tests rise-test
+          make -C tests rise-test #this triggers both testing of rise functionality & recording of screenshots
       
       - name: Run Screenshots Difference Test
         run: |
           sleep 5
-          make -C tests screenshots-test
+          make -C tests screenshots-test #this just runs screenshot difference
   
   
   gdb-Test:
-    runs-on: ubuntu-latest #use the latest ubuntu container image 
+    runs-on: ubuntu-latest 
     needs: Setup-and-Build
-    
     steps:
+      
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies #requirements docs unable to read, hard installing dependencies 
+      - name: Install Dependencies
         run: |
           pip install -r requirements/requirements.txt
 
@@ -327,6 +326,7 @@ jobs:
      runs-on: ubuntu-latest
      
      steps:
+     
      - name: Manual Approve
        run: |
         echo "Publication approved"
