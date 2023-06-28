@@ -331,8 +331,22 @@ jobs:
      steps:
      
      - name: Manual Approve
-       run: |
-        echo "Publication approved"
+       id: approval
+       uses: "actions/github-script@v5"
+       with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: { html_url: approvalUrl } } = await github.actions.createApproval({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: context.workflow,
+              event: context.eventName,
+              sha: context.sha,
+            });
+            console.log(`Approval required: ${approvalUrl}`);
+
+
+
 
 
   # Publish:
