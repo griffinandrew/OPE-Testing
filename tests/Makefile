@@ -20,12 +20,6 @@ endif
 screenshots-test:
 	python3 screenshots_diff.py
 
-# ----- Development Targets -----
-screenshots: CONT_ID ?= $(shell docker ps -q | head -n 1 )
-screenshots: TOKEN ?= $(shell docker exec $(CONT_ID) jupyter lab list 2>&1 | grep -o "token=[^ ]*" | cut -d= -f2)
-screenshots:
-	python3 mkscreenshots.py $(TOKEN)
-
 base_screenshots: screenshots-test
 base_screenshots:
 	mv *.png base_screenshots
