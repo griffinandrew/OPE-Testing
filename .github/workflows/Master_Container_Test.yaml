@@ -347,7 +347,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: { html_url: approvalUrl } } = await github.pulls.createReview({
+            const { data: { html_url: approvalUrl } } = await github.pulls.createApproval({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number,
@@ -360,7 +360,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: { state } } = await github.pulls.getReview({
+            const { data: { state } } = await github.pulls.getApproval({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number,
