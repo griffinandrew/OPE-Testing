@@ -343,12 +343,20 @@ jobs:
      #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
      steps:
       - name: Trigger Workflow
-        uses: trstringer/manual-approval@v1
+        uses: actions/github-script@v5
         with:
-         secret: ${{ github.TOKEN }}
-         approvers: griffinandrew
-         minimum-approvals: 1
-         issue-title: "OPE Container"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: { id } } = await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'Name of Approval Workflow',
+              ref: context.ref,
+              inputs: {
+                approval: 'true'
+              }
+            });
+            console.log(`Workflow dispatched with ID: ${id}`);
   
       
 
