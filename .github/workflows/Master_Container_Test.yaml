@@ -343,7 +343,6 @@ jobs:
 
     steps:
       - name: Create Approval
-        id: create_approval
         uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -357,7 +356,6 @@ jobs:
             console.log(`Approval required: ${approvalUrl}`);
 
       - name: Wait for Approval
-        id: wait_for_approval
         uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
