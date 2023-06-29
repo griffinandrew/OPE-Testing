@@ -341,8 +341,8 @@ jobs:
   Approval:
      runs-on: ubuntu-latest
      #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
-     environment:
-       name: approval
+     #environment:
+     #name: approval
      steps:
      
      - name: Manual Approve
