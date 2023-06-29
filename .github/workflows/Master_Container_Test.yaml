@@ -362,27 +362,7 @@ jobs:
     steps:
       - name: Wait for Approval
         run: |
-          echo "Waiting for approval..."
-          approvalStatus="PENDING"
-          while [[ "$approvalStatus" != "APPROVED" ]]
-          do
-          response=$(curl \
-          -X GET \
-          -H "Authorization: ***" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/griffinandrew/OPE-Testing/pulls//reviews")
-  
-          echo "Response: $response"  # Print the response for debugging purposes
-  
-          approvalStatus=$(echo "$response" | jq -r '.[] | select(.state=="APPROVED") | .state')
-          sleep 10
-          done
-
-          echo "Approval received."
-
-      - name: Create Pull Request Review
-        run: |
-          echo "Creating pull request review..."
+          echo "Creating workflow run review..."
           response=$(curl \
             -X POST \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -390,9 +370,11 @@ jobs:
             -d '{
               "event": "APPROVE"
             }' \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews")
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/reviews")
           approvalUrl=$(echo "$response" | jq -r '.html_url')
           echo "Approval required: $approvalUrl"
+
+      
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
