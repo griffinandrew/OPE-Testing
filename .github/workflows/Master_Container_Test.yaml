@@ -348,10 +348,10 @@ jobs:
           node-version: '14'
 
       - name: Install dependencies
-        run: npm install actions/github-script@v6
+        run: npm install actions/github-script@v5
 
       - name: Trigger workflow
-        uses: actions/github-script@v6
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
