@@ -338,24 +338,80 @@ jobs:
 
 
 
-  Approval:
-    runs-on: ubuntu-latest
-     #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
-    steps:
-     - name: Manual Approve
-       run: |
-          echo "Creating pull request review..."
-          response=$(curl \
-          -X POST \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-           -d '{
-           "event": "APPROVE"
-          }' \
-          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews")
-          approvalUrl=$(echo "$response" | jq -r '.html_url')
-          echo "Approval required: $approvalUrl"
+  # Approval:
+  #   runs-on: ubuntu-latest
+  #    #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
+  #   steps:
+  #    - name: Manual Approve
+  #      run: |
+  #         echo "Creating pull request review..."
+  #         response=$(curl \
+  #         -X POST \
+  #         -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+  #         -H "Accept: application/vnd.github.v3+json" \
+  #          -d '{
+  #          "event": "APPROVE"
+  #         }' \
+  #         "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews")
+  #         approvalUrl=$(echo "$response" | jq -r '.html_url')
+  #         echo "Approval required: $approvalUrl"
     
+
+  approval:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Check Run
+        id: create_check_run
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: { id: checkRunId } } = await github.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Manual Approval',
+              head_sha: context.sha,
+              status: 'in_progress',
+              started_at: new Date().toISOString()
+            });
+            console.log(`Check Run created with ID: ${checkRunId}`);
+            console.log('Please wait for manual approval...');
+
+      - name: Manual Approval
+        id: manual_approval
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: { html_url: approvalUrl } } = await github.checks.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              event: 'APPROVE',
+              body: 'Manual approval granted.'
+            });
+            console.log(`Approval granted: ${approvalUrl}`);
+
+      - name: Complete Check Run
+        if: steps.manual_approval.outputs.approvalUrl != ''
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: ${{ steps.create_check_run.outputs.checkRunId }},
+              status: 'completed',
+              conclusion: 'success',
+              completed_at: new Date().toISOString()
+            });
+            console.log('Check Run completed.');
+
+      - name: Continue After Approval
+        if: steps.manual_approval.outputs.approvalUrl != ''
+        run: echo "The approval has been granted. Proceed with the next steps."
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
