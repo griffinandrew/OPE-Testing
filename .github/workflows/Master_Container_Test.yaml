@@ -366,18 +366,17 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            let approvalStatus = '';
-            while (approvalStatus !== 'APPROVED') {
-              await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
-              const { data: { state } } = await github.actions.getApproval({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                approval_id: "${{ steps.approval.outputs.approvalId }}"
-              });
-              approvalStatus = state;
-            }
-            console.log("Approval received.");
-    
+           const { data: { html_url: approvalUrl } } = await github.actions.createApproval({
+           owner: context.repo.owner,
+           repo: context.repo.repo,
+           workflow_id: context.workflow,
+           event: context.eventName,
+           sha: context.sha,
+           });
+           console.log(Approval required: ${approvalUrl});
+      - name: Continue After Approval
+        #if: steps.approval.outputs.approvalUrl != ''
+        run: echo "The approval has been granted. Proceed with the next steps."
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
