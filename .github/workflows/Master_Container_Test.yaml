@@ -357,7 +357,7 @@ jobs:
   #         echo "Approval required: $approvalUrl"
     
 
-  manual_approval:
+  approval:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for Approval
