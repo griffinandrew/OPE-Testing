@@ -374,6 +374,9 @@ jobs:
           approvalUrl=$(echo "$response" | jq -r '.html_url')
           echo "Approval required: $approvalUrl"
           
+          # Extract the review ID from the response
+          reviewId=$(echo "$response" | jq -r '.id')
+          
           # Wait for approval
           echo "Waiting for approval..."
           approvalStatus=""
@@ -385,7 +388,7 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
               "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.workflow_run.pull_requests[0].number }}/reviews")
-            approvalStatus=$(echo "$reviewResponse" | jq -r '.[] | select(.state=="APPROVED") | .state')
+            approvalStatus=$(echo "$reviewResponse" | jq -r --arg reviewId "$reviewId" '.[] | select(.id == $reviewId) | .state')
           done
           
           echo "Approval received."
