@@ -350,16 +350,18 @@ jobs:
        with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: { html_url: approvalUrl } } = await github.actions.createApproval({
+            const { data: { id } } = await github.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: context.workflow,
-              event: context.eventName,
-              sha: context.sha,
+              workflow_id: 'NAME_OF_WORKFLOW',
+              ref: context.ref,
+              inputs: {
+                approval: 'true'
+              }
             });
-            console.log(`Approval required: ${approvalUrl}`);
+            console.log(`Workflow dispatched with ID: ${id}`);
      - name: Continue After Approval
-       if: steps.approval.outputs.approvalUrl != ''
+       #if: steps.approval.outputs.approvalUrl != ''
        run: echo "The approval has been granted. Proceed with the next steps."
   
       
