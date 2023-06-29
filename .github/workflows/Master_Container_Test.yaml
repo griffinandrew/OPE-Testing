@@ -341,20 +341,18 @@ jobs:
   Approval:
      runs-on: ubuntu-latest
      #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
-     environment:
-      name: approval
      steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-     - name: Set up Node.js
-       uses: actions/setup-node@v2
-       with:
-        node-version: '14'
-     - name: Install dependencies
-       run: npm install @actions/github
-     
-     - name: Manual Approve
-       uses: "actions/github-script@v5"
-       with:
+      - name: Install dependencies
+        run: npm install actions/github-script@v6
+
+      - name: Trigger workflow
+        uses: actions/github-script@v6
+        with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data: { id } } = await github.actions.createWorkflowDispatch({
@@ -367,9 +365,6 @@ jobs:
               }
             });
             console.log(`Workflow dispatched with ID: ${id}`);
-     - name: Continue After Approval
-       #if: steps.approval.outputs.approvalUrl != ''
-       run: echo "The approval has been granted. Proceed with the next steps."
   
       
 
