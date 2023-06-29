@@ -343,15 +343,12 @@ jobs:
      #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
      steps:
       - name: Trigger Workflow
-        uses: actions/github-script@v6
+        uses: trstringer/manual-approval@v1
         with:
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'test.yml',
-              ref: 'main',
-            })
+         secret: ${{ github.TOKEN }}
+         approvers: griffinandrew
+         minimum-approvals: 1
+         issue-title: "OPE Container"
   
       
 
