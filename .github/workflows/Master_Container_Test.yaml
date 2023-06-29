@@ -370,12 +370,12 @@ jobs:
             -d '{
               "event": "APPROVE"
             }' \
-            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/reviews")
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/approvals")
           approvalUrl=$(echo "$response" | jq -r '.html_url')
           echo "Approval required: $approvalUrl"
-          
-          # Extract the review ID from the response
-          reviewId=$(echo "$response" | jq -r '.id')
+  
+          # Extract the approval ID from the response
+          approvalId=$(echo "$response" | jq -r '.id')
           
           # Wait for approval
           echo "Waiting for approval..."
@@ -383,12 +383,12 @@ jobs:
           while [[ "$approvalStatus" != "APPROVED" ]]
           do
             sleep 10
-            reviewResponse=$(curl \
+            approvalResponse=$(curl \
               -X GET \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.workflow_run.pull_requests[0].number }}/reviews")
-            approvalStatus=$(echo "$reviewResponse" | jq -r --arg reviewId "$reviewId" '.[] | select(.id == $reviewId) | .state')
+              "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/approvals")
+            approvalStatus=$(echo "$approvalResponse" | jq -r --arg approvalId "$approvalId" '.approvals[] | select(.id == $approvalId) | .state')
           done
           
           echo "Approval received."
