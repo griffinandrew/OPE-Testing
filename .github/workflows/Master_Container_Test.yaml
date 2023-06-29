@@ -342,22 +342,42 @@ jobs:
     runs-on: ubuntu-latest
       #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
     steps:
-    - name: Manual Approve
-      run: |
-           echo "Creating pull request review..."
-           response=$(curl \
-           -X POST \
-           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-           -H "Accept: application/vnd.github.v3+json" \
-            -d '{
-            "event": "APPROVE"
-           }' \
-           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews")
-           approvalUrl=$(echo "$response" | jq -r '.html_url')
-           echo "Approval required: $approvalUrl"
+      - name: Manual Approve
+        id: approval
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: { html_url: approvalUrl, id: approvalId } } = await github.actions.createApproval({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: context.workflow,
+              event: context.eventName,
+              sha: context.sha,
+            });
+            console.log(`Approval required: ${approvalUrl}`);
+            console.log(`Approval ID: ${approvalId}`);
+            core.setOutput("approvalId", approvalId);
+            core.setOutput("approvalUrl", approvalUrl);
+  
+      - name: Wait for Approval
+        id: wait-approval
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let approvalStatus = '';
+            while (approvalStatus !== 'APPROVED') {
+              await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+              const { data: { state } } = await github.actions.getApproval({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                approval_id: "${{ steps.approval.outputs.approvalId }}"
+              });
+              approvalStatus = state;
+            }
+            console.log("Approval received.");
     
-
-      
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
