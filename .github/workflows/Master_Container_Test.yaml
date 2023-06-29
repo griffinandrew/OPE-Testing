@@ -233,7 +233,7 @@ jobs:
 
 
   UI-Test:
-    runs-on: ubuntu-latest #use the latest ubuntu container image
+    runs-on: ubuntu-latest
     needs: Setup-and-Build
     steps:
       
@@ -333,10 +333,8 @@ jobs:
             console.log(`Approval required: ${approvalUrl}`);
 
      - name: Continue After Approval
-       if: steps.approval.outputs.approvalUrl != ''
+       #if: steps.approval.outputs.approvalUrl != ''
        run: echo "The approval has been granted. Proceed with the next steps."
-
-
 
 
   Publish:
