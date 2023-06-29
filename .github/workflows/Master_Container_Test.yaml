@@ -346,7 +346,6 @@ jobs:
      steps:
      
      - name: Manual Approve
-       id: approval
        uses: "actions/github-script@v5"
        with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -367,7 +366,7 @@ jobs:
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
-     needs: approval
+     needs: Approval
      steps:
        - name: Checkout the code
          uses: actions/checkout@v3
