@@ -360,15 +360,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID/approve")
           
-          # Print the approval URL if the request was successful.
-          if [[ $(echo "$RESPONSE" | jq -r '.url') != "null" ]]; then
-            APPROVAL_URL=$(echo "$RESPONSE" | jq -r '.html_url')
-            echo "Approval required: $APPROVAL_URL"
-          else
-            echo "Failed to create workflow run approval."
-          fi
                  
-
 
 
   Publish:
