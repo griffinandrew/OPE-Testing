@@ -354,6 +354,25 @@ jobs:
             }' \
             "https://api.github.com/repos/${{ github.repository }}/check-runs"
 
+      - name: Wait for Approval
+        id: wait_for_approval
+        run: |
+          while true; do
+            response=$(curl \
+              -H "Accept: application/vnd.github.antiope-preview+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -s \
+              "https://api.github.com/repos/${{ github.repository }}/check-runs/${{ steps.create_check.outputs.id }}")
+
+            conclusion=$(echo "$response" | jq -r '.conclusion')
+
+            if [[ "$conclusion" == "success" ]]; then
+              break
+            fi
+
+            sleep 10
+          done
+
       - name: Display Check URL and ID
         run: |
           echo "Check created: ${{ steps.create_check.outputs.html_url }}"
