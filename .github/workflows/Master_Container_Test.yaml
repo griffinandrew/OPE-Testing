@@ -336,31 +336,44 @@ jobs:
   #      #if: steps.approval.outputs.approvalUrl != ''
   #      run: echo "The approval has been granted. Proceed with the next steps."
 
-  
-  Approval:
-     runs-on: ubuntu-latest
-     #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
-     environment:
-       name: approval
+  approval: 
+     runs-on: ubuntu-latest #use the latest ubuntu container image
      steps:
-     
-     - name: Manual Approve
-       id: approval
-       uses: "actions/github-script@v5"
-       with:
-          github-token: ${{ secrets.PAT_TOKENN }}
+      - name: Create Approval Check
+        id: create_check
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: { html_url: approvalUrl } } = await github.actions.createApproval({
+            const check = await github.checks.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: context.workflow,
-              event: context.eventName,
-              sha: context.sha,
+              name: 'Manual Approval',
+              head_sha: context.sha,
+              status: 'in_progress',
             });
-            console.log(`Approval required: ${approvalUrl}`);
-     - name: Continue After Approval
-       if: steps.approval.outputs.approvalUrl != ''
-       run: echo "The approval has been granted. Proceed with the next steps."
+            console.log(`Check created: ${check.data.html_url}`);
+            console.log(`Check ID: ${check.data.id}`);
+            console.log(`Check status: ${check.data.status}`);
+
+      - name: Get Check Status
+        id: get_check_status
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const check = await github.checks.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: ${{ steps.create_check.outputs.create_check_id }},
+            });
+            console.log(`Check status: ${check.data.status}`);
+
+
+
+
+
+
       
 
   Publish:
