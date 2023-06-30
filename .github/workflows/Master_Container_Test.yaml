@@ -341,20 +341,22 @@ jobs:
      steps:
       - name: Create Approval Check
         id: create_check
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const check = await github.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'Manual Approval',
-              head_sha: context.sha,
-              status: 'in_progress',
-            });
-            console.log(`Check created: ${check.data.html_url}`);
-            console.log(`Check ID: ${check.data.id}`);
-            console.log(`Check status: ${check.data.status}`);
+        run: |
+          npm install @actions/github
+          node -e '
+          const { Octokit } = require("@actions/github");
+          const octokit = new Octokit();
+          const createCheckResponse = await octokit.checks.create({
+            owner: process.env.GITHUB_REPOSITORY_OWNER,
+            repo: process.env.GITHUB_REPOSITORY,
+            name: "Manual Approval",
+            head_sha: process.env.GITHUB_SHA,
+            status: "in_progress",
+          });
+          console.log(`Check created: ${createCheckResponse.data.html_url}`);
+          console.log(`Check ID: ${createCheckResponse.data.id}`);
+          console.log(`Check status: ${createCheckResponse.data.status}`);
+          '
 
       - name: Get Check Status
         id: get_check_status
