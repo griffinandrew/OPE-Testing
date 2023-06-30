@@ -339,20 +339,26 @@ jobs:
   approval: 
      runs-on: ubuntu-latest #use the latest ubuntu container image
      steps:
-      - name: Create Approval Check
-        id: create_check
-        run: |
-         curl \
-            -X POST \
-            -H "Accept: application/vnd.github.antiope-preview+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "name": "Manual Approval",
-              "head_sha": "${{ github.sha }}",
-              "status": "in_progress"
-            }' \
-            "https://api.github.com/repos/${{ github.repository }}/check-runs"
+       - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Request Approval
+        id: request_approval
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data } = await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'your-original-workflow-id',
+              ref: context.sha,
+              inputs: {
+                approval_requested: 'true'
+              }
+            });
+
+            console.log(`Approval request dispatched. Run ID: ${data.id}`);
 
       - name: Wait for Approval
         id: wait_for_approval
@@ -362,7 +368,7 @@ jobs:
               -H "Accept: application/vnd.github.antiope-preview+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -s \
-              "https://api.github.com/repos/${{ github.repository }}/check-runs/${{ steps.create_check.outputs.id }}")
+              "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ steps.request_approval.outputs.approval_request_run_id }}")
 
             conclusion=$(echo "$response" | jq -r '.conclusion')
 
@@ -373,10 +379,9 @@ jobs:
             sleep 10
           done
 
-      - name: Display Check URL and ID
+      - name: Display Approval Request Run ID
         run: |
-          echo "Check created: ${{ steps.create_check.outputs.html_url }}"
-          echo "Check ID: ${{ steps.create_check.outputs.id }}"
+          echo "Approval request dispatched. Run ID: ${{ steps.request_approval.outputs.approval_request_run_id }}"
 
 
 
