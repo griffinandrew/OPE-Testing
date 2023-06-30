@@ -313,7 +313,7 @@ jobs:
 
   Approval:
     runs-on: ubuntu-latest
-    #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
+    needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
     environment:
       name: approval
     steps:
@@ -336,12 +336,12 @@ jobs:
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
-     #needs: Approval
+     needs: Approval
      steps:
-       - name: Checkout the code
+       - name: Checkout Code
          uses: actions/checkout@v3
 
-       - name: Push to public version
+       - name: Push to Public Version
          run: |
            REGISTRY=$(cat base/ope_book_registry)
            REGISTRY_USER=$(cat base/ope_book_user)
