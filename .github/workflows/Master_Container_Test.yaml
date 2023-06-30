@@ -342,10 +342,8 @@ jobs:
       - name: Create Approval Check
         id: create_check
         run: |
-          npm install @actions/github
           node -e '
-          const { Octokit } = require("@actions/github");
-          const octokit = new Octokit();
+          const octokit = require("@actions/github").getOctokit(process.env.GITHUB_TOKEN);
           (async () => {
             const createCheckResponse = await octokit.checks.create({
               owner: process.env.GITHUB_REPOSITORY_OWNER,
