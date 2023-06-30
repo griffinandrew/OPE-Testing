@@ -339,7 +339,8 @@ jobs:
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
-     needs: Approval
+     #needs: Approval
+     needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
      steps:
        - name: Checkout the code
          uses: actions/checkout@v3
