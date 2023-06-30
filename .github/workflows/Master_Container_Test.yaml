@@ -339,7 +339,7 @@ jobs:
   approval: 
      runs-on: ubuntu-latest #use the latest ubuntu container image
      steps:
-       - name: Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
       - name: Request Approval
