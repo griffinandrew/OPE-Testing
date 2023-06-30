@@ -348,10 +348,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data } = await github.actions.createWorkflowDispatch({
+            const { data } = await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'your-original-workflow-id',
+              workflow_id: context.workflow,
               ref: context.sha,
               inputs: {
                 approval_requested: 'true'
