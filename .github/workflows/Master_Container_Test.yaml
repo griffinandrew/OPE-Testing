@@ -319,8 +319,6 @@ jobs:
     steps:
       - name: Create Workflow Run Approval
         run: |
-          # Generate a temporary personal access token with appropriate permissions.
-          # Make sure to store it as a secret in your repository settings.
           TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
           # Extract the necessary information for the API request.
