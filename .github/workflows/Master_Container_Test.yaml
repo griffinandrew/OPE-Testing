@@ -342,36 +342,22 @@ jobs:
       - name: Create Approval Check
         id: create_check
         run: |
-          node -e '
-          const octokit = require("@actions/github").getOctokit(process.env.GITHUB_TOKEN);
-          (async () => {
-            const createCheckResponse = await octokit.checks.create({
-              owner: process.env.GITHUB_REPOSITORY_OWNER,
-              repo: process.env.GITHUB_REPOSITORY,
-              name: "Manual Approval",
-              head_sha: process.env.GITHUB_SHA,
-              status: "in_progress",
-            });
-            console.log(`Check created: ${createCheckResponse.data.html_url}`);
-            console.log(`Check ID: ${createCheckResponse.data.id}`);
-            console.log(`Check status: ${createCheckResponse.data.status}`);
-          })();
-          '
+         curl \
+            -X POST \
+            -H "Accept: application/vnd.github.antiope-preview+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "Manual Approval",
+              "head_sha": "${{ github.sha }}",
+              "status": "in_progress"
+            }' \
+            "https://api.github.com/repos/${{ github.repository }}/check-runs"
 
-      - name: Get Check Status
-        id: get_check_status
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const check = await github.checks.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              check_run_id: ${{ steps.create_check.outputs.create_check_id }},
-            });
-            console.log(`Check status: ${check.data.status}`);
-
-
+      - name: Display Check URL and ID
+        run: |
+          echo "Check created: ${{ steps.create_check.outputs.html_url }}"
+          echo "Check ID: ${{ steps.create_check.outputs.id }}"
 
 
 
