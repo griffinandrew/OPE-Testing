@@ -349,14 +349,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: { html_url: approvalUrl } } = await github.actions.createApproval({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: context.workflow,
-              event: context.eventName,
-              sha: context.sha,
-            });
-            console.log(`Approval required: ${approvalUrl}`);
+              const { data: { html_url: approvalUrl } } = await github.rest.actions.createApproval({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: context.workflow,
+                run_id: context.runId,
+              });
+              console.log(`Approval required: ${approvalUrl}`);
+              return { approvalUrl };
+
       - name: Continue After Approval
         if: ${{ always() }}
         run: echo "The approval has been granted. Proceed with the next steps."
