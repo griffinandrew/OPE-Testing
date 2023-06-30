@@ -335,58 +335,7 @@ jobs:
   #    - name: Continue After Approval
   #      #if: steps.approval.outputs.approvalUrl != ''
   #      run: echo "The approval has been granted. Proceed with the next steps."
-
-  approval: 
-     runs-on: ubuntu-latest #use the latest ubuntu container image
-     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Request Approval
-        id: request_approval
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { data } = await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: context.workflow,
-              ref: context.sha,
-              inputs: {
-                approval_requested: 'true'
-              }
-            });
-
-            console.log(`Approval request dispatched. Run ID: ${data.id}`);
-
-      - name: Wait for Approval
-        id: wait_for_approval
-        run: |
-          while true; do
-            response=$(curl \
-              -H "Accept: application/vnd.github.antiope-preview+json" \
-              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              -s \
-              "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ steps.request_approval.outputs.approval_request_run_id }}")
-
-            conclusion=$(echo "$response" | jq -r '.conclusion')
-
-            if [[ "$conclusion" == "success" ]]; then
-              break
-            fi
-
-            sleep 10
-          done
-
-      - name: Display Approval Request Run ID
-        run: |
-          echo "Approval request dispatched. Run ID: ${{ steps.request_approval.outputs.approval_request_run_id }}"
-
-
-
-
-      
+  
 
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
