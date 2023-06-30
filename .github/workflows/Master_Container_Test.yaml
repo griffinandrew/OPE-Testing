@@ -309,37 +309,11 @@ jobs:
          fi
          docker stop stable
 
-
-  # Approval:
-  #    runs-on: ubuntu-latest
-  #    #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
-  #    environment:
-  #      name: approval
-  #    steps:
-     
-  #    - name: Manual Approve
-  #      id: approval
-  #      uses: "actions/github-script@v5"
-  #      with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         script: |
-  #           const { data: { html_url: approvalUrl } } = await github.actions.createApproval({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             workflow_id: context.workflow,
-  #             event: context.eventName,
-  #             sha: context.sha,
-  #           });
-  #           console.log(`Approval required: ${approvalUrl}`);
-
-  #    - name: Continue After Approval
-  #      #if: steps.approval.outputs.approvalUrl != ''
-  #      run: echo "The approval has been granted. Proceed with the next steps."
   
 
   Approval:
     runs-on: ubuntu-latest
-    #needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
+    needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
     environment:
       name: approval
     steps:
@@ -362,11 +336,9 @@ jobs:
           
                  
 
-
   Publish:
      runs-on: ubuntu-latest #use the latest ubuntu container image
-     #needs: Approval
-     needs: [Setup-and-Build, Health-Check, Image-Version-Check, JupyterNB-Test, Package-Version-Test, Checksum, Size-and-Time-Display, UI-Test, gdb-Test]
+     needs: Approval
      steps:
        - name: Checkout the code
          uses: actions/checkout@v3
