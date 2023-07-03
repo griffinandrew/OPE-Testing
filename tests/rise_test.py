@@ -31,7 +31,7 @@ else:
 print("Accessing url: "+url)
 driver.get(url)
 
-driver.implicitly_wait(30)
+driver.implicitly_wait(45)
 
 driver.save_screenshot('main_screenshot.png')
 print("Saved main screenshot")
