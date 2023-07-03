@@ -27,7 +27,7 @@ jobs:
         run: |
           set -e  # Exit immediately if any command fail
           start=$(date +%s) #start the timer
-          timeout 30m time make build 
+          timeout 40m time make build 
           end=$(date +%s) #end timer
           seconds=$((end-start))  #calc build time in sec
           elapsed=$(echo "scale=2; ($end - $start) / 60.0" | bc) #get time in min with dec
