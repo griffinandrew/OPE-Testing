@@ -84,9 +84,9 @@ jobs:
           HEALTH=$(docker ps --format "{{.Names}}: {{.Status}}" | grep "$CONTAINER_NAME" | awk '{print $2}') #extract health status
           echo ""
           if [[ "$HEALTH" == "Up" ]]; then
-          echo "HEALTHY : container is up and running"
+          echo "******Pass: container is up and running*******"
           else
-          echo "ERROR : container is not running"
+          echo "*******ERROR : container is not running*******"
           exit -1
           fi
           echo ""
@@ -114,9 +114,9 @@ jobs:
           docker inspect $IMAGE > image.json #write inspect info to json for parsing
           REPO_TAG=$(jq -r '.[0].RepoTags[0]' image.json) #acquire tag
           if [[ "$REPO_TAG" == "$IMAGE" ]]; then
-          echo "CORRECT IMAGE AND VERSION: $IMAGE"
+          echo "*********CORRECT IMAGE AND VERSION: $IMAGE*********"
           else
-          echo "INCORRECT IMAGE or VERSION, $REPO_TAG is not the proper image $IMAGE"
+          echo "***********INCORRECT IMAGE or VERSION, $REPO_TAG is not the proper image $IMAGE**********"
           exit -1
           fi
           docker stop stable
