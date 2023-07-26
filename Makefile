@@ -91,13 +91,13 @@ publish: pull-beta
 publish: DARGS ?=
 publish: ## publish current private build to public published version
 # make dated version
-	docker tag $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(DATE_TAG)
+	docker tag $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(DATE_TAG)_$(TIME)_$(SIZE)
 # push to private image repo
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(DATE_TAG)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(DATE_TAG)_$(TIME)_$(SIZE)
 # copy to tip version
-	docker tag $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)
+	docker tag $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(TIME)_$(SIZE)
 # push to update tip to current version
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(TIME)_$(SIZE)
 
 
 checksum: ARGS ?= find / -not \( -path /proc -prune \) -not \( -path /sys -prune \) -type f -exec stat -c '%n %a' {} + | LC_ALL=C sort | sha256sum | cut -c 1-64
