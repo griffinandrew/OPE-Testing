@@ -242,7 +242,7 @@ jobs:
 
   UI-Test:
     runs-on: ubuntu-latest
-    needs: Setup-and-Build
+    #needs: Setup-and-Build
     steps:
       
       - name: Checkout Code
