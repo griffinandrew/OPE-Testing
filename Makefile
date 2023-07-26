@@ -72,14 +72,15 @@ build: DARGS ?= --build-arg FROM_REG=$(BASE_REG) \
 build: ## Make the image customized appropriately
 	docker build $(DARGS) $(DCACHING) -t $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) base
 
+TIME=? 2
 push: DARGS ?=
 push: ## push private build
 # make dated version
-	docker tag  $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)
+	docker tag  $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)
 # push to private image repo
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)
 # push to update tip to current version
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(TIME)
 
 
 pull-beta: DARGS ?=

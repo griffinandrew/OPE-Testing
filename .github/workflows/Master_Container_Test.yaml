@@ -46,7 +46,8 @@ jobs:
           REGISTRY_USER=$(cat base/ope_book_user)
           echo $REGISTRY $REGISTRY_USER
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-          make push
+          TIME = $(cat time.txt)
+          make push TIME=$TIME
       
       - name: Upload Image
         uses: actions/upload-artifact@v3
@@ -242,7 +243,7 @@ jobs:
 
   UI-Test:
     runs-on: ubuntu-latest
-    #needs: Setup-and-Build
+    needs: Setup-and-Build
     steps:
       
       - name: Checkout Code
