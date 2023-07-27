@@ -48,7 +48,9 @@ jobs:
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
           #TIME=$(cat time.txt)
           TIME=34532
-          make push TIME="$TIME"
+          #SIZE=$(docker images --format "{{.Size}}" | head -n 1)
+          SIZE=123124
+          make push TIME="$TIME" SIZE="SIZE"
       
       - name: Upload Image
         uses: actions/upload-artifact@v3
