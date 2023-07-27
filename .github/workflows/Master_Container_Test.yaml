@@ -47,7 +47,7 @@ jobs:
           echo $REGISTRY $REGISTRY_USER
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
           #TIME=$(cat time.txt)
-          TIME=2
+          TIME=5
           make push TIME="$TIME"
       
       - name: Upload Image
