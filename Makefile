@@ -80,16 +80,16 @@ build: ## Make the image customized appropriately
 push: DARGS ?=
 push: ## push private build
 # make dated version
-	docker tag  $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)
+	docker tag  $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)_$(SIZE)
 # push to private image repo
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)_$(SIZE)
 # push to update tip to current version
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(TIME)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(TIME)_$(SIZE)
 
 
 pull-beta: DARGS ?=
 pull-beta: ## pull most recent private version
-	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
+	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(TIME)_$(SIZE)
 
 
 publish: pull-beta
