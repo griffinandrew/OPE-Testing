@@ -2,7 +2,7 @@ name: Master OPE Container Test
 on:
   push:
     branches:
-      - '*'
+      - 'container-base-ope'
 
 env:
     REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements/requirements.txt
-            
+           
       - name: Build
         run: |
           set -e  # Exit immediately if any command fail
@@ -34,19 +34,24 @@ jobs:
           min=${elapsed%.*}  #extract min part 
           sec_cut=${elapsed#*.} #get the decimal 
           sec_round="${sec_cut:0:1}.${sec_cut:1}"
-          sec=$( echo "$sec_round * 6" | bc -l) #calc secs
-          echo "BUILD TIME:  $min MIN $sec SECS  or  $seconds seconds" > ./time.txt #send to file for use in diff run
+          sec=$(echo "$sec_round * 6" | bc -l) #calc secs
+          echo "$(min)m$(sec)s" > ./time.txt #send to file for use in diff run
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
           echo "Image = $IMAGE"
           echo $IMAGE > ./image.txt   
 
       - name: Push Beta Version
         run: |
+          IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
+          docker run  -d --name stable $IMAGE
           REGISTRY=$(cat base/ope_book_registry)
           REGISTRY_USER=$(cat base/ope_book_user)
           echo $REGISTRY $REGISTRY_USER
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-          make push
+          TIME=$(cat time.txt)
+          SIZE=$(docker images --format "{{.Size}}" | head -n 1)
+          make push TIME="$TIME" SIZE="$SIZE"
+          docker stop stable
       
       - name: Upload Image
         uses: actions/upload-artifact@v3
@@ -225,11 +230,20 @@ jobs:
           SIZE=$( docker images --format "{{.Size}}" $IMAGE ) #extract size from running image
           echo ""
           echo ""
-          cat time.txt #display calced time
+          TIME=$(cat time.txt)
+          echo "BUILD TIME:  $TIME" #display calced time
           echo "" 
           echo "IMAGE SIZE:  $SIZE" #display size in GB
           echo ""
+          echo $SIZE > size.txt
           docker stop stable
+      
+      - name: Upload Size
+        uses: actions/upload-artifact@v3
+        with:
+          name: size
+          path: |
+            size.txt
 
 
   UI-Test:
@@ -247,7 +261,7 @@ jobs:
         
       - name: Install Chromium
         run: |
-          sudo apt-get update
+          #sudo apt-get update
           sudo apt-get install -y chromium-browser
           sudo apt-get upgrade chromium-browser
 
@@ -341,11 +355,23 @@ jobs:
        - name: Checkout Code
          uses: actions/checkout@v3
 
+       - name: Download Time
+         uses: actions/download-artifact@v3
+         with:
+          name: time
+
+       - name: Download Size
+         uses: actions/download-artifact@v3
+         with:
+          name: size
+
        - name: Push to Public Version
          run: |
            REGISTRY=$(cat base/ope_book_registry)
            REGISTRY_USER=$(cat base/ope_book_user)
+           TIME=$(cat time.txt)
+           SIZE=$(cat size.txt)
            docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-           make publish
+           make publish TIME="$TIME" SIZE="$SIZE"
 
 
