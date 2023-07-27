@@ -84,12 +84,12 @@ push: ## push private build
 # push to private image repo
 	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(DATE_TAG)_$(TIME)_$(SIZE)
 # push to update tip to current version
-	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(TIME)_$(SIZE)
+	docker push $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
 
 
 pull-beta: DARGS ?=
 pull-beta: ## pull most recent private version
-	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)_$(TIME)_$(SIZE)
+	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_BETA_TAG)
 
 
 publish: pull-beta
@@ -138,13 +138,13 @@ user: ## start private version with usershell to poke around
 ### PUBLIC USAGE TARGETS
 pull: 
 pull: ## pull most recent public version
-	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)
+	docker pull $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(TIME)_$(SIZE)
 
 run: pull
 run: ARGS ?=
 run: DARGS ?= -u $(OPE_UID):$(OPE_GID) -v "${HOST_DIR}":"${MOUNT_DIR}" -v "${SSH_AUTH_SOCK}":"${SSH_AUTH_SOCK}" -v "${SSH_AUTH_SOCK}":"${SSH_AUTH_SOCK}" -e SSH_AUTH_SOCK=${SSH_AUTH_SOCK} -p ${SSH_PORT}:22
 run: PORT ?= 8888
 run: ## start published version with jupyter lab interface
-	docker run -it --rm -p $(PORT):$(PORT) $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG) $(ARGS) 
+	docker run -it --rm -p $(PORT):$(PORT) $(DARGS) $(OPE_BOOK_REG)$(OPE_BOOK_IMAGE)$(OPE_PUBLIC_TAG)_$(TIME)_$(SIZE) $(ARGS) 
 
 

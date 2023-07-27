@@ -50,7 +50,7 @@ jobs:
           TIME=34532
           #SIZE=$(docker images --format "{{.Size}}" | head -n 1)
           SIZE=123124
-          make push TIME="$TIME" SIZE="SIZE"
+          make push TIME="$TIME" SIZE="$SIZE"
       
       - name: Upload Image
         uses: actions/upload-artifact@v3
@@ -369,11 +369,7 @@ jobs:
            REGISTRY_USER=$(cat base/ope_book_user)
            TIME=$(cat time.txt)
            SIZE=$(cat size.txt)
-           #echo "$TIME" >> $GITHUB_ENV
-           #echo "$SIZE" >> $GITHUB_ENV
-           
-
            docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-           make publish $TIME $SIZE
+           make publish TIME="$TIME" SIZE="$SIZE"
 
 
