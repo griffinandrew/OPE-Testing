@@ -46,8 +46,8 @@ jobs:
           REGISTRY_USER=$(cat base/ope_book_user)
           echo $REGISTRY $REGISTRY_USER
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-          #TIME=$(cat time.txt)
-          TIME=5
+          TIME=$(cat time.txt)
+          
           make push TIME="$TIME"
       
       - name: Upload Image
