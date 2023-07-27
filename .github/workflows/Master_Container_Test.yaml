@@ -36,6 +36,7 @@ jobs:
           sec_round="${sec_cut:0:1}.${sec_cut:1}"
           sec=$( echo "$sec_round * 6" | bc -l) #calc secs
           echo "BUILD TIME:  $min MIN $sec SECS  or  $seconds seconds" > ./time.txt #send to file for use in diff run
+          echo "$(min)m  $(sec)s" > ./time_short.txt #send to file for use in diff run
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
           echo "Image = $IMAGE"
           echo $IMAGE > ./image.txt   
@@ -48,7 +49,7 @@ jobs:
           REGISTRY_USER=$(cat base/ope_book_user)
           echo $REGISTRY $REGISTRY_USER
           docker login $REGISTRY -u $REGISTRY_USER -p $REGISTRY_PASSWORD
-          TIME=$(cat time.txt)
+          TIME=$(cat time_short.txt)
           SIZE=$(docker images --format "{{.Size}}" | head -n 1)
           make push TIME="$TIME" SIZE="$SIZE"
           docker stop stable
