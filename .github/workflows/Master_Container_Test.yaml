@@ -34,7 +34,7 @@ jobs:
           min=${elapsed%.*}  #extract min part 
           sec_cut=${elapsed#*.} #get the decimal 
           sec_round="${sec_cut:0:1}.${sec_cut:1}"
-          sec=$( echo "$sec_round * 6" | bc -l) #calc secs
+          sec=$(echo "$sec_round * 6" | bc -l) #calc secs
           echo "$(min)m$(sec)s" > ./time.txt #send to file for use in diff run
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
           echo "Image = $IMAGE"
