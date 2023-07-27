@@ -260,8 +260,9 @@ jobs:
           python-version: '3.9'
         
       - name: Install Chromium
+        timeout-minutes: 5
         run: |
-          sudo apt-get update
+          #sudo apt-get update
           sudo apt-get install -y chromium-browser
           sudo apt-get upgrade chromium-browser
 
