@@ -37,8 +37,7 @@ jobs:
           sec=$(echo "$sec_round * 6" | bc -l) #calc secs
           #combined_time="${min}m${sec}s"  # Combine min and sec without spaces
           #echo "$combined_time" > ./time.txt #send to file for use in diff run
-
-          echo "${min}.m.${sec}.s." > ./time.txt #send to file for use in diff run
+          echo "${min}.m_${sec}.s" > ./time.txt #send to file for use in diff run
           IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1) #get built image
           echo "Image = $IMAGE"
           echo $IMAGE > ./image.txt   
